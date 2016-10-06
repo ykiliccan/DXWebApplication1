@@ -1,0 +1,48 @@
+﻿
+@Html.DevExpress().TreeList(settings =>
+{
+    settings.Name = "treeList1";
+    settings.CallbackRouteValues = new { Controller = "TabPageTest", Action = "TreeListControl" };
+    settings.Width = 424;
+    settings.Height = 353;
+    settings.CallbackRouteValues = new { Controller = "TabPageTest", Action = "TreeListControl" };
+    settings.CustomActionRouteValues = new { Controller = "TabPageTest", Action = "TreeListControl" };
+    settings.SettingsEditing.AddNewNodeRouteValues = new { Controller = "TabPageTest", Action = "TreeListControlAddNew" };
+    settings.SettingsEditing.UpdateNodeRouteValues = new { Controller = "TabPageTest", Action = "TreeListControlEdit" };
+    settings.SettingsEditing.DeleteNodeRouteValues = new { Controller = "TabPageTest", Action = "TreeListControlDelete" };
+
+    settings.SettingsBehavior.ExpandCollapseAction = TreeListExpandCollapseAction.NodeClick;
+    settings.SettingsBehavior.AutoExpandAllNodes = false;
+
+    settings.CommandColumn.Visible = true;
+    //settings.CommandColumn.ShowNewButtonInHeader = false;
+    settings.CommandColumn.NewButton.Visible = true;
+    settings.CommandColumn.EditButton.Visible = true;
+    settings.SettingsEditing.Mode = TreeListEditMode.EditFormAndDisplayNode;
+    settings.SettingsPopupEditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+    settings.SettingsPopupEditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+    settings.SettingsPopupEditForm.Modal = true;
+    settings.SettingsPopupEditForm.AllowResize = false;
+    settings.SettingsBehavior.AllowFocusedNode = true;
+
+    settings.ClientSideEvents.BeginCallback = @"OnBeginCallback";
+    settings.ClientSideEvents.NodeFocusing = "OnTreeNodeFocusing";
+
+    settings.CommandColumn.Width = Unit.Pixel(150);
+    settings.CommandColumn.DeleteButton.Visible = false;
+    settings.CommandColumn.DeleteButton.Image.IconID = IconID.EditDelete16x16;
+    settings.CommandColumn.EditButton.Image.IconID = IconID.EditEdit16x16;
+    settings.CommandColumn.NewButton.Image.IconID = IconID.ActionsInsert16x16;
+
+    TreeListCommandColumnCustomButton deleteButton = new TreeListCommandColumnCustomButton();
+    deleteButton.Image.IconID = IconID.EditDelete16x16;
+    deleteButton.Text = "Delete";
+    deleteButton.Visibility = TreeListCustomButtonVisibility.AllNodes;
+    deleteButton.ID = "cmdDelete";
+    settings.CommandColumn.CustomButtons.Add(deleteButton);
+
+    settings.AutoGenerateColumns = false;
+    //settings.Width = Unit.Percentage(100);
+    settings.KeyFieldName = "Id";
+    settings.ParentFieldName = "parentId";
+}).GetHtml()

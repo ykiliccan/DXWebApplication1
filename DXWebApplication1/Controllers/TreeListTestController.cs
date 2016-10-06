@@ -13,5 +13,10 @@ namespace DXWebApplication1.Controllers
         {
             return View();
         }
+        public ActionResult TreeListControl()
+        {
+
+            return View();
+        }
     }
 }
