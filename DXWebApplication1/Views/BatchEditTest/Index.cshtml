@@ -1,0 +1,66 @@
+﻿
+<script type="text/javascript">
+
+
+    //function OnBatchEditStartEditing(s, e) {
+    //    var templateColumn = s.GetColumnByField("ParametreDegerId");
+    //    if (!e.rowValues.hasOwnProperty(templateColumn.index))
+    //        return;
+    //    var cellInfo = e.rowValues[templateColumn.index];
+    //    cbEdit.SetValue(cellInfo.value);
+    //    if (e.focusedColumn === templateColumn)
+    //        cbEdit.SetFocus();
+    //}
+
+
+    function OnBatchEditStartEditing(s, e) {
+            ToggleButtons(true);
+    }
+    function OnBatchEditEndEditing(s, e) {
+        window.setTimeout(function () {
+            if (!s.batchEditApi.HasChanges())
+                ToggleButtons(false);
+        }, 0);
+    }
+    function ToggleButtons(enabled) {
+        btnUpdateBatch.SetEnabled(enabled);
+        btnCancelBatch.SetEnabled(enabled);
+    }
+    function OnUpdateBatchClick(s, e) {
+        GridView.UpdateEdit();
+        ToggleButtons(false);
+    }
+    function OnCancelBatchClick(s, e) {
+        GridView.CancelEdit();
+        ToggleButtons(false);
+    }
+
+    function OnEndCallback(s, e) {
+        window.setTimeout(function () {
+            if (!s.batchEditApi.HasChanges())
+                ToggleButtons(false);
+        }, 0);
+    }
+
+
+    function onTextChanged(s, e) {
+        if (s.GetText() == 'newperson') {
+            cbEdit.SetVisible(true);
+            txtEdit.SetVisible(false);
+        } else {
+            cbEdit.SetVisible(false);
+            txtEdit.SetVisible(true);
+        }
+    }
+    function ChangeHiddenValue(s, e) {
+        var hidden = document.getElementById('ParametreDegerId');
+        hidden.value = cbEdit.GetVisible() ? cbEdit.GetText() : txtEdit.GetText();
+    }
+
+</script>
+@{
+
+
+    Html.RenderAction("GridViewPartial", "BatchEditTest");
+
+ }

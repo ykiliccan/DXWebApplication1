@@ -1,0 +1,166 @@
+@model List<DXWebApplication1.Models.Parameters>
+@using System.Web.UI.WebControls
+
+
+
+@{
+    var grid1 = Html.DevExpress().GridView(
+    settings =>
+    {
+        settings.Width = 600;
+        settings.Name = "GridView";
+        settings.Settings.ShowTitlePanel = true;
+
+        settings.CallbackRouteValues = new { Controller = "InlineEditTest", Action = "GridViewPartial" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "InlineEditTest", Action = "UpdateGridViewPartial" };
+
+        settings.SettingsBehavior.AllowFocusedRow = true;
+        settings.SettingsLoadingPanel.Mode = GridViewLoadingPanelMode.ShowAsPopup;
+        settings.CommandColumn.ShowEditButton = true;
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+
+
+        settings.KeyFieldName = "Id";
+        settings.Columns.Add("Id");
+        settings.Columns.Add("Adi");
+        settings.Columns.Add("ParametreDegerString").Visible = false;
+        settings.Columns.Add("DegistiMi").Visible = false;
+
+
+        settings.Columns.Add(ts =>
+        {
+            ts.Name = "cmbParametreDegerId";
+            ts.FieldName = "ParametreDegerId";
+            ts.ColumnType = MVCxGridViewColumnType.ComboBox;
+
+            var cmbEditProp = ts.PropertiesEdit as ComboBoxProperties;
+        });
+
+        settings.ClientSideEvents.BeginCallback = "OnBeginCallback";
+
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.Visible = true;
+
+
+        //settings.ClientSideEvents.BeginCallback = "function(s,e){console.log('hello');if(typeof(GridView.cpArIds)!='undefined' ){  e.customArgs['liste'] = GridView.cpArIds.join();console.log(GridView.cpArIds.join());} }";
+
+        settings.HtmlDataCellPrepared = (s, e) =>
+        {
+            MVCxGridView grid = s as MVCxGridView;
+
+            e.Cell.Attributes.Add("onclick", "StartEditGrid(" + e.VisibleIndex + ")");
+
+            bool value = Convert.ToBoolean(grid.GetRowValues(e.VisibleIndex, "DegistiMi"));
+            if(value && e.DataColumn.FieldName == "ParametreDegerId")
+            {
+                e.Cell.BackColor = System.Drawing.Color.LightPink;
+            }
+
+
+        };
+
+        settings.CustomColumnDisplayText = (s, e) =>
+        {
+            if (e.Column.FieldName != "ParametreDegerId") return;
+            MVCxGridView grid = s as MVCxGridView;
+
+
+            //string adi  = Convert.ToString(grid.GetRowValues(e.VisibleRowIndex, "Adi"));
+            string parametreDegerString = Convert.ToString(grid.GetRowValues(e.VisibleRowIndex, "ParametreDegerString"));
+
+            e.DisplayText = parametreDegerString; //adi + " : " + Convert.ToInt32(e.Value).ToString();
+
+        };
+
+        settings.CustomJSProperties = (s, e) =>
+        {
+            MVCxGridView grid = (MVCxGridView)s;
+
+            List<string> listParametreDegerId = new List<string>();
+
+
+            for (int i = 0; i < grid.VisibleRowCount; i++)
+            {
+                int parametreDegerId = (int?)grid.GetRowValues(i, "ParametreDegerId") ?? 0;
+                int parametreId = (int)grid.GetRowValues(i, "Id");
+                listParametreDegerId.Add(string.Format("{0}|{1}",parametreId,parametreDegerId));
+            }
+
+            e.Properties["cpParametreDegerListesi"] = string.Join(",", listParametreDegerId);// ParametreId|ParametreDegerId,....
+        };
+
+        settings.CellEditorInitialize = (sender, e) =>
+        {
+
+            MVCxGridView grid = sender as MVCxGridView;
+            ASPxEdit editor = (ASPxEdit)e.Editor;
+
+            // 
+
+            // editor.ValidationSettings.Display = Display.None;
+            if (grid.IsNewRowEditing)
+                return;
+
+            if (grid.IsEditing)
+            {
+                if (e.Column.FieldName.Equals("ParametreDegerId", StringComparison.OrdinalIgnoreCase))
+                {
+                    int pId = Convert.ToInt32(grid.GetRowValues(e.VisibleIndex, "Id"));
+
+                    ASPxComboBox cmb = (ASPxComboBox)e.Editor;
+                    cmb.DataSource = DXWebApplication1.Models.ParametreSample.GetParametreDegerleri().Where(p => p.ParametreId == pId);
+                    //cmb.TextField = "Min";
+                    cmb.ValueField = "Id";
+                    cmb.Columns.Add("Max");
+                    cmb.Columns.Add("Min");
+                    cmb.TextFormatString = "{0} - {1}";
+
+
+                    cmb.DataBind();
+
+                    //e.Editor.ClientEnabled = false;
+                    //e.Editor.Visible = false;
+                    //e.Editor.ClientVisible = false;
+
+
+                }
+                else
+                {
+                    e.Editor.ClientEnabled = false;//Batch editte etkisi yok,DataBound eventi iþe yarýyor
+                }
+            }
+        };
+
+        settings.DataBound = (sender, e) =>
+        {
+            var gridView = sender as MVCxGridView;
+            foreach (GridViewDataColumn col in gridView.DataColumns)
+            {
+                if (!col.FieldName.Equals("ParametreDegerId"))
+                    col.EditFormSettings.Visible = DefaultBoolean.False;
+            }
+        };
+
+
+
+
+
+        settings.InitNewRow = (s, e) =>
+        {
+            // e.NewValues["value"] = 1;
+        };
+
+
+
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid1.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid1.Bind(Model).GetHtml()
+
+

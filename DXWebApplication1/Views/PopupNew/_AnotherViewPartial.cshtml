@@ -1,0 +1,97 @@
+@model DXWebApplication1.Models.UserBookModel
+@using System.Web.UI.WebControls
+
+@using (Html.BeginForm("AnotherAdd", "PopupNew", new { Area = "" }, FormMethod.Post))
+{
+    Html.DevExpress().FormLayout(formLayoutSettings =>
+    {
+        formLayoutSettings.Name = "FormLayoutAnaotherView";
+        formLayoutSettings.Width = System.Web.UI.WebControls.Unit.Percentage(100);
+        formLayoutSettings.ColCount = 1;
+
+        formLayoutSettings.Items.AddEmptyItem();
+
+
+        formLayoutSettings.Items.Add(item =>
+        {
+
+            item.FieldName = "Id";
+            item.ClientVisible = false;//Gizli
+        });
+
+
+        formLayoutSettings.Items.Add(item =>
+        {
+            item.Caption = "BookName";
+            item.FieldName = "Name";
+            item.NestedExtension().TextBox(s => {
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                s.ShowModelErrors = true;
+
+            });
+        });
+
+
+
+        formLayoutSettings.Items.Add(item =>
+        {
+            item.Caption = "ISBN";
+            item.FieldName = "ISBN";
+            item.NestedExtension().TextBox(s =>
+            {
+                s.Properties.ValidationSettings.ErrorDisplayMode = ErrorDisplayMode.ImageWithTooltip;
+                s.ShowModelErrors = true;
+            });
+        });
+
+       
+        formLayoutSettings.Items.AddEmptyItem();
+
+        formLayoutSettings.Items.Add(newItem =>{
+            newItem.ShowCaption = DefaultBoolean.False;
+            newItem.SetNestedContent(() =>
+            {
+                Html.ViewContext.Writer.Write("<div style='float:right'>");
+                Html.DevExpress().Button(
+                btnSettings =>
+                {
+                    btnSettings.Name = "btnSave";
+                    btnSettings.UseSubmitBehavior = true;
+                    btnSettings.Images.Image.IconID = IconID.ActionsApply16x16;
+                    btnSettings.Text = "Kaydet";
+                    btnSettings.RouteValues = new { Controller = "IhtiyacDetay", Action = "IhtiyacWorkPathOnayla", ParamValue = Model.Book.Id };
+                }).Render();
+                 Html.DevExpress().Button(
+                  btnSettings =>
+                  {
+                      btnSettings.Name = "btnCikis";
+                      btnSettings.Text = "Çýkýþ";
+                      btnSettings.UseSubmitBehavior = false;
+
+                      btnSettings.Images.Image.IconID = IconID.ActionsCancel16x16;
+                      btnSettings.Style[HtmlTextWriterStyle.MarginLeft] = "5px";
+                      btnSettings.ClientSideEvents.Click = "function(s,e){ GridView.CancelEdit();}";
+                  }).Render();
+            });
+        });
+        if (ViewData["EditError"] != null)
+        {
+            formLayoutSettings.Items.AddEmptyItem();
+            formLayoutSettings.Items.Add(textItem =>
+            {
+                textItem.ShowCaption = DefaultBoolean.False;
+                textItem.SetNestedContent(() =>
+                {
+                    Html.ViewContext.Writer.Write("<div class='bg-danger'><br/>");
+                    Html.ViewContext.Writer.Write("<span class='text-danger'> Ýþlem sýrasýnda bir hata oluþtu :</span><br/>");
+                    Html.ViewContext.Writer.Write("<span class='text-danger'>" + (ViewData["EditError"] as string) + "</span><br/><br/>");
+                    Html.ViewContext.Writer.Write("</div>");
+
+                });
+            });
+        }
+    }).Bind(Model.Book).GetHtml();
+}
+
+
+

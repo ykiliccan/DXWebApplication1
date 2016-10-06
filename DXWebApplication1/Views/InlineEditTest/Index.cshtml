@@ -1,0 +1,36 @@
+﻿
+<script type="text/javascript">
+
+
+    function StartEditGrid(rowIndex) {
+        var isEditing = GridView.IsEditing();
+        if (isEditing) {
+            if (confirm("Do you want to update the grid?")) {
+                GridView.UpdateEdit();
+            }
+        }
+        else {
+            GridView.StartEditRow(rowIndex);
+        }
+    }
+    function OnBeginCallback(s, e) {
+        console.log('Begin callback' + e.command);
+        console.log(s.cpParametreDegerListesi);
+
+
+
+        if (e.command === "UPDATEEDIT" || e.command === "STARTEDIT") {
+
+            e.customArgs["ParametreDegerListesi"] = s.cpParametreDegerListesi;
+            console.log(s.cpParametreDegerListesi);
+        }
+    }
+
+
+</script>
+@{
+
+
+    Html.RenderAction("GridViewPartial", "InlineEditTest");
+
+ }

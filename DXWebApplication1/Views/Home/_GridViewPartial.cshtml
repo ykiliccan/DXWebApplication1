@@ -1,0 +1,133 @@
+@model List<DXWebApplication1.Models.User>
+@using System.Web.UI.WebControls
+
+@{
+    var grid1 = Html.DevExpress().GridView(
+    settings =>
+    {
+        settings.Name = "GridView";
+        settings.Settings.ShowTitlePanel = true;
+        settings.CallbackRouteValues = new { Controller = "Home", Action = "GridViewPartial" };
+        settings.CustomActionRouteValues = new { Controller = "Home", Action = "GridViewPartial" };
+        settings.SettingsEditing.AddNewRowRouteValues = new { Controller = "Home", Action = "AddNew" };
+        settings.SettingsEditing.UpdateRowRouteValues = new { Controller = "Home", Action = "GridViewPartialUpdate" };
+        settings.SettingsEditing.DeleteRowRouteValues = new { Controller = "Home", Action = "Delete" };
+        settings.SettingsBehavior.AllowFocusedRow = true;
+        settings.SettingsLoadingPanel.Mode = GridViewLoadingPanelMode.ShowAsPopup;
+
+        settings.KeyFieldName = "Id";
+        settings.Columns.Add("Id");
+        settings.Columns.Add("Name");
+        settings.Columns.Add("value");
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.PopupEditForm;
+        settings.SettingsPopup.EditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+        settings.SettingsPopup.EditForm.Modal = true;
+
+
+        settings.CommandColumn.ShowEditButton = true;
+        settings.CommandColumn.ShowNewButton = true;
+        settings.CommandColumn.Visible = true;
+
+        settings.InitNewRow = (s, e) =>
+        {
+            e.NewValues["value"] = 1;
+        };
+
+
+
+        settings.SetEditFormTemplateContent(c =>
+        {
+            Html.DevExpress().FormLayout(formLayoutSettings =>
+            {
+                formLayoutSettings.Name = "FormLayout1";
+                formLayoutSettings.Width = Unit.Percentage(100);
+                formLayoutSettings.ColCount = 1;
+
+                formLayoutSettings.Items.Add(i =>
+                {
+                    i.FieldName = "Id";
+                    i.Caption = "Id";
+                    i.NestedExtension().Label(nex =>
+                    {
+                        nex.ClientVisible = true;
+                    });
+
+
+                });
+                formLayoutSettings.Items.Add(i =>
+                {
+                    i.FieldName = "Name";
+                    i.Caption = "Name";
+                    i.NestedExtension().TextBox(nex =>
+                    {
+                        nex.ClientVisible = true;
+                    });
+
+                });
+                formLayoutSettings.Items.Add(i =>
+                {
+                    i.FieldName = "value";
+                    i.Caption = "Value";
+                    //i.Name = "txtValueCtrl";
+                    
+                    i.NestedExtension().TextBox(nex =>
+                    {
+                        //nex.Enabled = false;
+                        //nex.Name = "value";
+                        nex.Properties.ClientInstanceName = "txtValueCtrl";
+                        nex.ClientEnabled = true;
+                    });
+
+                });
+
+                Html.DevExpress().Button(
+                btnSettings =>
+                {
+                    btnSettings.Name = "btnUpdate1";
+                    btnSettings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                    btnSettings.Text = "SetValue(1)";
+
+                    btnSettings.Style[HtmlTextWriterStyle.MarginRight] = "5px";
+                    btnSettings.ClientSideEvents.Click = "function(s, e){ASPxClientControl.GetControlCollection().GetByName('txtValueCtrl').SetValue(1); " + settings.Name + ".UpdateEdit(); }";
+                }).Render();
+
+
+                Html.DevExpress().Button(
+                btnSettings =>
+                {
+                    btnSettings.Name = "btnUpdate2";
+                    btnSettings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                    btnSettings.Text = "SetValue(2)";
+
+                    btnSettings.Style[HtmlTextWriterStyle.MarginRight] = "5px";
+                    btnSettings.ClientSideEvents.Click = "function(s, e){ ASPxClientControl.GetControlCollection().GetByName('txtValueCtrl').SetValue(2);" + settings.Name + ".UpdateEdit(); }";
+                }).Render();
+
+
+
+                Html.DevExpress().Button(
+                btnSettings =>
+                {
+                    btnSettings.Name = "btnUpdate3";
+                    btnSettings.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                    btnSettings.Text = "SetValue(2)";
+
+                    btnSettings.Style[HtmlTextWriterStyle.MarginRight] = "5px";
+                    btnSettings.ClientSideEvents.Click = "function(s, e){ ASPxClientControl.GetControlCollection().GetByName('txtValueCtrl').SetValue(3);  " + settings.Name + ".UpdateEdit(); }";
+                }).Render();
+            }).Bind(ViewData["Users"] ?? c.DataItem).Render();
+
+
+        });
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid1.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid1.Bind(Model).GetHtml()
+
+

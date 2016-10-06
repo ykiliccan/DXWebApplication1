@@ -1,0 +1,123 @@
+﻿
+@model  DXWebApplication1.Models.RibbonFeaturesDemoOptions
+
+@*@section AdditionalResources {*@
+    <style type="text/css">
+    .container {
+        vertical-align: top;
+        border-right: 1px solid #c8ccd1;
+        border-bottom: 1px solid #c8ccd1;
+        padding: 50px 50px 95px;
+        height: 40px;
+        background: url(@Url.Content("~/Content/Ribbon/editor.png")) no-repeat;
+    }
+    </style>
+@*}*@
+<script type="text/javascript">
+    $(document).ready(function(){
+        $(".OptionsTable")
+            .find("input[type=checkbox]")
+            .change(function(){ $("form").submit(); });
+    });
+    function OnWindowResize(s, e) {
+        ribbon.AdjustControl();
+    }
+    function OnCommandExecuted(s, e) {
+        var text = e.item.name;
+        if(e.parameter !== null)
+            text += ": " + e.parameter;
+        label.SetText(text);
+    }
+    function OnFileTabClicked(s, e) {
+        label.SetText("File Tab");
+    }
+    function OnDialogBoxLauncherClicked(s, e) {
+        label.SetText("Show a dialog for the " + e.group.name + " group");
+    }
+    function OnPopupPopUp(s, e) {
+        var element = document.getElementById("popupContainer");
+        if(s.GetHeight() > element.clientHeight)
+            element.setAttribute("style", "height: 410px; margin-top: 10px;");
+    }
+</script>
+@using (Html.BeginForm())
+{
+    <table class="OptionsTable" style="width: 100%">
+        <tr>
+            <td>
+                @Html.CheckBoxFor(m => m.AllowMinimize)
+                @Html.LabelFor(m => m.AllowMinimize)
+            </td>
+            <td>
+                @Html.CheckBoxFor(m => m.ShowFileTab)
+                @Html.LabelFor(m => m.ShowFileTab)
+            </td>
+            <td>
+                @Html.CheckBoxFor(m => m.ShowTabs)
+                @Html.LabelFor(m => m.ShowTabs)
+            </td>
+            <td>
+                @Html.CheckBoxFor(m => m.ShowGroupNames)
+                @Html.LabelFor(m => m.ShowGroupNames)
+            </td>
+        </tr>
+    </table>
+
+    <div id="popupContainer" style="height: 340px; margin-top: 10px;"></div>
+
+    @Html.DevExpress().PopupControl(
+        settings =>
+        {
+            settings.Name = "popup";
+            settings.PopupElementID = "popupContainer";
+            settings.ShowShadow = false;
+            settings.AllowResize = true;
+            settings.AllowDragging = false;
+            settings.CloseAction = CloseAction.None;
+            settings.ShowSizeGrip = ShowSizeGrip.True;
+            settings.PopupAction = PopupAction.None;
+            settings.ShowHeader = false;
+            settings.ShowFooter = true;
+            settings.FooterText = "Resize the ribbon by the size grip to see the control responsive layout functionality";
+            settings.PopupAlignCorrection = PopupAlignCorrection.Disabled;
+            settings.PopupAnimationType = AnimationType.None;
+            settings.ShowOnPageLoad = true;
+            settings.MaxWidth = Unit.Pixel(850);
+            settings.MinWidth = Unit.Pixel(300);
+            settings.Width = Unit.Pixel(750);
+            settings.MaxHeight = Unit.Pixel(293);
+            settings.MinHeight = Unit.Pixel(293);
+            settings.Height = Unit.Pixel(293);
+            settings.ControlStyle.Border.BorderWidth = 0;
+            settings.Styles.Content.Paddings.Padding = 0;
+            settings.Styles.Footer.HorizontalAlign = HorizontalAlign.Right;
+            settings.ClientSideEvents.AfterResizing = "OnWindowResize";
+            settings.ClientSideEvents.PopUp = "OnPopupPopUp";
+
+            settings.SetContent(() =>
+            {
+                ViewContext.Writer.Write(
+                @"<table id=""editor"" style=""width:100%;"">
+                    <tr style=""height: 1px"">
+                        <td>"
+                );
+                Html.RenderPartial("FeaturesPartial", Model);
+                ViewContext.Writer.Write(
+                        @"</td>
+                    </tr>
+                    <tr>
+                        <td class=""container"" id=""container"">"
+                );
+                Html.DevExpress().Label(s =>
+                {
+                    s.Name = "label";
+                    s.Properties.EnableClientSideAPI = true;
+                }).Render();
+                ViewContext.Writer.Write(
+                        @"</td>
+                    </tr>
+                </table>"
+                );
+            });
+        }).GetHtml()
+}

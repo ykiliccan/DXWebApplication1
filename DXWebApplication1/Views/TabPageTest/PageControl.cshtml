@@ -1,0 +1,16 @@
+﻿
+  @Html.DevExpress().PageControl(
+        settings =>
+        {
+            settings.Name = "pcCallbacks";
+            settings.CallbackRouteValues = new { Controller = "TabPageTest", Action = "OnCallback" };
+            settings.Width = 424;
+            settings.Height = 353;
+            settings.TabAlign = TabAlign.Justify;
+            settings.TabPosition = TabPosition.Top;
+            settings.TabPages.Add("Original");
+            settings.TabPages.Add("Cross-Process");
+            settings.TabPages.Add("Sepia");
+
+            settings.ClientSideEvents.BeginCallback = "function(s,e){e.customArgs['tabIndex'] = s.GetActiveTabIndex();}";
+        }).GetHtml()

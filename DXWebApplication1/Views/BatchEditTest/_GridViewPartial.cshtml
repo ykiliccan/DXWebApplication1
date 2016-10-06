@@ -1,0 +1,146 @@
+@model List<DXWebApplication1.Models.Parameters>
+@using System.Web.UI.WebControls
+
+
+
+@{
+    var grid1 = Html.DevExpress().GridView(
+    settings =>
+    {
+        settings.Width = 600;
+        settings.Name = "GridView";
+        settings.Settings.ShowTitlePanel = true;
+        settings.SetTitlePanelTemplateContent(c =>
+        {
+            ViewContext.Writer.Write("<div style=\"float:left;margin:5px 0 0 5px;\">");
+            Html.DevExpress().Button(button =>
+            {
+                button.Name = "btnUpdateBatch";
+                button.Text = "Güncelle";
+                button.ClientVisible =true;
+                button.Images.Image.IconID = IconID.ActionsSave16x16devav;
+                button.Style[HtmlTextWriterStyle.MarginRight] = "10px";
+                button.ClientSideEvents.Click = "OnUpdateBatchClick";
+            }).GetHtml();
+
+            Html.DevExpress().Button(button =>
+            {
+                button.Name = "btnCancelBatch";
+                button.Text = "Ýptal";
+                button.ClientVisible = true;
+                button.Images.Image.IconID = IconID.ActionsCancel16x16;
+                button.Style[HtmlTextWriterStyle.MarginRight] = "10px";
+                button.ClientSideEvents.Click = "OnCancelBatchClick";
+            }).GetHtml();
+            ViewContext.Writer.Write("</div>");
+
+            ViewContext.Writer.Write("<div style=\"float:center;margin:5px 0 0 5px;\">");
+            ViewContext.Writer.Write("<b>Batch Edit DEneme Here satýr için farklý combo</b>");
+            ViewContext.Writer.Write("</div>");
+        });
+
+
+
+        settings.CallbackRouteValues = new { Controller = "BatchEditTest", Action = "GridViewPartial" };
+        
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.Inline;
+        settings.SettingsBehavior.AllowFocusedRow = true;
+        settings.SettingsLoadingPanel.Mode = GridViewLoadingPanelMode.ShowAsPopup;
+
+        settings.KeyFieldName = "Id";
+        settings.Columns.Add("Id");
+        settings.Columns.Add("Adi");
+        settings.Columns.Add(ts => {
+            ts.Name = "txtParametreDegerId";
+            ts.FieldName = "ParametreDegerId";
+
+            ts.ColumnType = MVCxGridViewColumnType.TextBox;
+            var textEditProperties = ts.PropertiesEdit as TextBoxProperties;
+
+
+        });
+
+
+     
+
+
+
+
+        settings.SettingsEditing.Mode = GridViewEditingMode.Batch;
+        settings.SettingsEditing.BatchEditSettings.EditMode = GridViewBatchEditMode.Cell;
+        settings.SettingsEditing.BatchEditSettings.StartEditAction = GridViewBatchStartEditAction.Click;
+
+
+
+        settings.CommandColumn.ShowEditButton = false;
+        settings.CommandColumn.ShowNewButton = false;
+        settings.CommandColumn.Visible = true;
+
+
+        //settings.ClientSideEvents.BeginCallback = "function(s,e){console.log('hello');if(typeof(GridView.cpArIds)!='undefined' ){  e.customArgs['liste'] = GridView.cpArIds.join();console.log(GridView.cpArIds.join());} }";
+
+
+
+        //settings.CellEditorInitialize = (sender, e) =>
+        //{
+
+        //    MVCxGridView grid = sender as MVCxGridView;
+        //    ASPxEdit editor = (ASPxEdit)e.Editor;
+
+        //    // ASPxComboBox cmb = (ASPxComboBox)e.Editor;
+
+        //    editor.ValidationSettings.Display = Display.None;
+        //    if (grid.IsNewRowEditing)
+        //        return;
+
+        //    if (grid.IsEditing)
+        //    {
+        //        if (e.Column.FieldName.Equals("ParametreDegerId", StringComparison.OrdinalIgnoreCase))
+        //        {
+
+        //            //e.Editor.ClientEnabled = false;
+        //            //e.Editor.Visible = false;
+        //            //e.Editor.ClientVisible = false;
+
+
+        //        }
+        //        else
+        //        {
+        //            e.Editor.ClientEnabled = false;//Batch editte etkisi yok,DataBound eventi iþe yarýyor
+        //        }
+        //    }
+        //};
+
+        settings.DataBound = (sender, e) =>
+        {
+            var gridView = sender as MVCxGridView;
+            foreach (GridViewDataColumn col in gridView.DataColumns)
+            {
+                if (!col.FieldName.Equals("ParametreDegerId"))
+                    col.EditFormSettings.Visible = DefaultBoolean.False;
+            }
+        };
+
+
+
+
+
+        settings.InitNewRow = (s, e) =>
+        {
+            // e.NewValues["value"] = 1;
+        };
+
+
+
+
+    });
+
+    if (ViewData["EditError"] != null)
+    {
+        grid1.SetEditErrorText((string)ViewData["EditError"]);
+    }
+}
+@grid1.Bind(Model).GetHtml()
+
+

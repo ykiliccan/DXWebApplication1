@@ -1,0 +1,257 @@
+﻿
+@model DXWebApplication1.Models.RibbonFeaturesDemoOptions
+
+@functions{
+    T CreateButtonItem<T>(string name, string text, string iconID) where T : RibbonButtonItem
+    {
+        return CreateButtonItem<T>(name, text, RibbonItemSize.Small, iconID);
+    }
+    T CreateButtonItem<T>(string name, string text, RibbonItemSize size, string iconID) where T : RibbonButtonItem
+    {
+        var item = Activator.CreateInstance<T>();
+        item.Name = name;
+        item.Text = text;
+        item.Size = size;
+        if (size == RibbonItemSize.Large)
+            item.LargeImage.IconID = iconID;
+        else
+            item.SmallImage.IconID = iconID;
+        return item;
+    }
+    RibbonGalleryItem CreateGalleryItem(string text, string iconID)
+    {
+        var galleryItem = new RibbonGalleryItem
+        {
+            Text = text,
+            Value = text,
+            ToolTip = text
+        };
+        galleryItem.Image.IconID = iconID;
+        return galleryItem;
+    }
+}
+
+@Html.DevExpress().Ribbon(
+    settings =>
+    {
+        settings.Name = "ribbon";
+        settings.AllowMinimize = Model.AllowMinimize;
+        settings.ShowFileTab = Model.ShowFileTab;
+        settings.ShowTabs = Model.ShowTabs;
+        settings.ShowGroupLabels = Model.ShowGroupNames;
+
+        settings.ClientSideEvents.CommandExecuted = "OnCommandExecuted";
+        settings.ClientSideEvents.FileTabClicked = "OnFileTabClicked";
+        settings.ClientSideEvents.DialogBoxLauncherClicked = "OnDialogBoxLauncherClicked";
+        
+        
+        var homeTab = settings.Tabs.Add("Home");
+        
+        homeTab.Groups.Add(g =>
+        {
+            g.Name = "Clipboard";
+            g.Text = "Clipboard";
+            g.Image.IconID = IconID.ReportsReport32x32;
+            g.ShowDialogBoxLauncher = true;
+            
+
+            var pasteItem = CreateButtonItem<RibbonDropDownButtonItem>("Paste", "Paste", RibbonItemSize.Large, IconID.ActionsInsert32x32);
+            pasteItem.Items.Add(
+                CreateButtonItem<RibbonDropDownButtonItem>("Paste", "Paste", IconID.ActionsInsert16x16),
+                CreateButtonItem<RibbonDropDownButtonItem>("Paste special", "Paste special", IconID.ActionsInsert16x16)
+            );
+            g.Items.Add(pasteItem);
+
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Cut", "Cut", IconID.EditCut16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Copy", "Copy", IconID.ActionsMerge16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Clear", "Clear", IconID.ActionsClear16x16));
+        });
+        homeTab.Groups.Add(g =>
+        {
+            g.Name = "Font";
+            g.Text = "Font";
+            g.Image.IconID = "alignment_contentautoarrange_32x32";
+            g.ShowDialogBoxLauncher = true;
+
+            var fontFamilyItem = (RibbonComboBoxItem)g.Items.Add(MVCxRibbonItemType.ComboBoxItem, "Font Family");
+            fontFamilyItem.PropertiesComboBox.NullText = "Font Family";
+            fontFamilyItem.Items.Add("Arial");
+            fontFamilyItem.Items.Add("Times New Roman");
+            fontFamilyItem.Items.Add("Calibri");
+            fontFamilyItem.Items.Add("Verdana");
+
+            var fontSizeItem = (RibbonComboBoxItem)g.Items.Add(MVCxRibbonItemType.ComboBoxItem, "Font Size");
+            fontSizeItem.PropertiesComboBox.NullText = "Font Size";
+            fontSizeItem.Items.Add("10", 10);
+            fontSizeItem.Items.Add("11", 11);
+            fontSizeItem.Items.Add("12", 12);
+            fontSizeItem.Items.Add("14", 14);
+            fontSizeItem.Items.Add("16", 16);
+            fontSizeItem.Items.Add("18", 18);
+
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Increase Size", null, IconID.FormatFontsizeincrease16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Decrease Size", null, IconID.FormatFontsizedecrease16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Hidden Text", null, IconID.FormatHiddentext16x16));
+            g.Items.Add(CreateButtonItem<RibbonToggleButtonItem>("Bold", null, IconID.FormatBold16x16));
+            g.Items.Add(CreateButtonItem<RibbonToggleButtonItem>("Italic", null, IconID.FormatItalic16x16));
+            g.Items.Add(CreateButtonItem<RibbonToggleButtonItem>("Underline", null, IconID.FormatUnderline16x16));
+            g.Items.Add(CreateButtonItem<RibbonToggleButtonItem>("Strikeout", null, IconID.FormatStrikeout16x16));
+            g.Items.Add(CreateButtonItem<RibbonToggleButtonItem>("Subscript", null, IconID.FormatSubscript16x16));
+            g.Items.Add(CreateButtonItem<RibbonToggleButtonItem>("Superscript", null, IconID.FormatSuperscript16x16));
+            g.Items.Add(CreateButtonItem<RibbonColorButtonItem>("Highlight Color", null, IconID.FormatHighlightfield16x16));
+            g.Items.Add(CreateButtonItem<RibbonColorButtonItem>("Font Color", null, IconID.FormatChangefontstyle16x16));
+        });
+
+        homeTab.Groups.Add(g =>
+        {
+            g.Name = "Paragraph";
+            g.Text = "Paragraph";
+            g.Image.IconID = "format_showhidden_32x32";
+            g.ShowDialogBoxLauncher = true;
+
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Bulletsr", null, IconID.FormatListbullets16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Numbering", null, IconID.FormatListnumbers16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Multilevel List", null, IconID.FormatListmultilevel16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Decrease Indent", null, IconID.FormatIndentdecrease16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Increase Indent", null, IconID.FormatIndentincrease16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Sort", null, IconID.DataSortasc16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Hidden Symbols", null, IconID.FormatShowhidden16x16));
+
+            var alignLeftItem = (RibbonOptionButtonItem)g.Items.Add(MVCxRibbonItemType.OptionButtonItem, "Align Left");
+            alignLeftItem.OptionGroupName = "Align";
+            alignLeftItem.SmallImage.IconID = IconID.FormatAlignleft16x16;
+
+            var alignCenterItem = (RibbonOptionButtonItem)g.Items.Add(MVCxRibbonItemType.OptionButtonItem, "Align Center");
+            alignCenterItem.OptionGroupName = "Align";
+            alignCenterItem.SmallImage.IconID = IconID.FormatAligncenter16x16;
+
+            var alignRightItem = (RibbonOptionButtonItem)g.Items.Add(MVCxRibbonItemType.OptionButtonItem, "Align Right");
+            alignRightItem.OptionGroupName = "Align";
+            alignRightItem.SmallImage.IconID = IconID.FormatAlignright16x16;
+
+            var alignJustifyItem = (RibbonOptionButtonItem)g.Items.Add(MVCxRibbonItemType.OptionButtonItem, "Align Justify");
+            alignJustifyItem.OptionGroupName = "Align";
+            alignJustifyItem.SmallImage.IconID = IconID.FormatAlignjustify16x16;
+
+            g.Items.Add(CreateButtonItem<RibbonColorButtonItem>("Shading", null, IconID.FormatPictureshapefillcolor16x16));
+        });
+
+        homeTab.Groups.Add(g =>
+        {
+            g.Name = "Editing";
+            g.Text = "Editing";
+            g.Image.IconID = IconID.EditCustomization32x32;
+            g.ShowDialogBoxLauncher = true;
+
+            var findItem = CreateButtonItem<RibbonDropDownButtonItem>("Find", "Find", IconID.FindFind16x16);
+            findItem.Items.Add(
+                CreateButtonItem<RibbonDropDownButtonItem>("Find", "Find", IconID.FindFind16x16),
+                CreateButtonItem<RibbonDropDownButtonItem>("Go To", "Go To", IconID.ArrowsNext16x16)
+            );
+            g.Items.Add(findItem);
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Replace", "Replace", IconID.FormatReplace16x16));
+        });
+
+        var insertTab = settings.Tabs.Add("Insert");
+        insertTab.Groups.Add(g =>
+        {
+            g.Name = "Tables";
+            g.Text = "Tables";
+            g.ShowDialogBoxLauncher = true;
+
+            var tableItem = CreateButtonItem<RibbonDropDownButtonItem>("Table", "Table", RibbonItemSize.Large, IconID.GridCards32x32);
+            tableItem.Items.Add(
+                CreateButtonItem<RibbonDropDownButtonItem>(null, "Insert Table", RibbonItemSize.Large, IconID.GridCards16x16),
+                CreateButtonItem<RibbonDropDownButtonItem>(null, "Draw Table", RibbonItemSize.Large, IconID.GridCustomizegrid16x16),
+                CreateButtonItem<RibbonDropDownButtonItem>(null, "Quick Table", RibbonItemSize.Large, IconID.GridGrid16x16)
+            );
+            g.Items.Add(tableItem);
+        });
+
+        insertTab.Groups.Add(g =>
+        {
+            g.Name = "Illustrations";
+            g.Text = "Illustrations";
+            g.ShowDialogBoxLauncher = true;
+
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Picture", "Picture", RibbonItemSize.Large, IconID.ContentImage32x32));
+        });
+
+        insertTab.Groups.Add(g =>
+        {
+            g.Name = "Charts";
+            g.Text = "Charts";
+            g.ShowDialogBoxLauncher = true;
+
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Bar", null, IconID.ChartBar16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Bubble", null, IconID.ChartBubble16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Chart", null, IconID.ChartChart16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Drill Down", null, IconID.ChartDrilldownonseriesChart16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Full Stacked Bar", null, IconID.ChartFullstackedbar16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Full Stacked Line", null, IconID.ChartFullstackedline16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Pie Style Donut", null, IconID.ChartPiestyledonut16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Chart Line", null, IconID.ChartLine16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Candle Chart", null, IconID.ChartOpenhighlowclosecandlestick16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Stock Chart", null, IconID.ChartOpenhighlowclosestock16x16));
+        });
+
+        insertTab.Groups.Add(g =>
+        {
+            g.Name = "Gauges";
+            g.Text = "Gauges";
+            g.ShowDialogBoxLauncher = true;
+            g.Image.IconID = IconID.GaugesGaugestylethreeforthcircular32x32;
+
+            var gaugesGalleryItem = (RibbonGalleryBarItem)g.Items.Add(MVCxRibbonItemType.GalleryBarItem, "Gauges");
+            gaugesGalleryItem.MaxColumnCount = 3;
+            gaugesGalleryItem.MaxTextWidth = 80;
+            gaugesGalleryItem.AllowSelectItem = false;
+            gaugesGalleryItem.PropertiesDropDownGallery.RowCount = 3;
+            gaugesGalleryItem.PropertiesDropDownGallery.ShowGroupText = false;
+            var gaugesGalleryGroup = new RibbonGalleryGroup();
+            gaugesGalleryItem.Groups.Add(gaugesGalleryGroup);
+
+            gaugesGalleryGroup.Items.Add(
+                CreateGalleryItem("Full Circular", IconID.GaugesGaugestylefullcircular32x32),
+                CreateGalleryItem("Half Circular", IconID.GaugesGaugestylehalfcircular32x32),
+                CreateGalleryItem("Quarter Circular", IconID.GaugesGaugestyleleftquartercircular32x32),
+                CreateGalleryItem("Linear Horizontal", IconID.GaugesGaugestylelinearhorizontal32x32),
+                CreateGalleryItem("Linear Vertical", IconID.GaugesGaugestylelinearvertical32x32),
+                CreateGalleryItem("Right Quarter Circular", IconID.GaugesGaugestylerightquartercircular32x32),
+                CreateGalleryItem("Three Forth Circular", IconID.GaugesGaugestylethreeforthcircular32x32)
+            );
+            g.Items.Add(gaugesGalleryItem);
+        });
+
+        var viewTab = settings.Tabs.Add("View");
+        viewTab.Groups.Add(g =>
+        {
+            g.Name = "Zoom";
+            g.Text = "Zoom";
+            g.ShowDialogBoxLauncher = true;
+
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Zoom", "Zoom", RibbonItemSize.Large, IconID.ZoomZoom32x32));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Zoom In", "Zoom In", RibbonItemSize.Small, IconID.ZoomZoomin16x16));
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("Zoom Out", "Zoom Out", RibbonItemSize.Small, IconID.ZoomZoomout16x16));
+        });
+        viewTab.Groups.Add(g =>
+        {
+            g.Name = "Fullscreen";
+            g.Text = "Fullscreen";
+            g.ShowDialogBoxLauncher = true;
+
+            g.Items.Add(CreateButtonItem<RibbonButtonItem>("FullScreen", null, RibbonItemSize.Large, IconID.SchedulingSnaptocells32x32));
+        });
+        viewTab.Groups.Add(g =>
+        {
+            g.Name = "Settings";
+            g.Text = "Settings";
+            g.ShowDialogBoxLauncher = true;
+
+            var settingsItem = CreateButtonItem<RibbonDropDownButtonItem>("", "", RibbonItemSize.Large, IconID.SetupProperties32x32);
+            settingsItem.DropDownMode = false;
+            settingsItem.Items.Add(CreateButtonItem<RibbonDropDownToggleButtonItem>("WordWrap", "Word Wrap", ""));
+            settingsItem.Items.Add(CreateButtonItem<RibbonDropDownToggleButtonItem>("NonprintingCharacters", "Nonprinting Characters", "format_showhidden_16x16"));
+            g.Items.Add(settingsItem);
+        });
+    }).GetHtml()

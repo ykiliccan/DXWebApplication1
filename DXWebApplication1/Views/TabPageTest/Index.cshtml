@@ -1,0 +1,12 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<div>
+
+    @using (Html.BeginForm())
+    {
+        //Html.Partial("PageControl");
+        Html.RenderAction("OnCallback","TabPageTest");
+    }
+</div>
