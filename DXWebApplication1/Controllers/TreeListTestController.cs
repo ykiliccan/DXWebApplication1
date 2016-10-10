@@ -20,10 +20,22 @@ namespace DXWebApplication1.Controllers
             return PartialView(model);
         }
 
-        public ActionResult Custom(string filter = "")
+        public ActionResult Custom(string filter = "",string ozFilter="")
         {
             ViewData["search"] = filter.ToLower();
-            return PartialView("TreeListControl", TreeListModel.GetTreeListData());
+            ViewData["ozFilter"] = ozFilter.ToLower();
+
+            List<TreeListModel> model = null;
+            if(!string.IsNullOrWhiteSpace(ozFilter))
+            {
+                model = TreeListModel.GetTreeListDataWithFilter(ozFilter);
+            }
+            else
+            {
+                model = TreeListModel.GetTreeListData();
+            }
+
+            return PartialView("TreeListControl", model);
         }
 
     }

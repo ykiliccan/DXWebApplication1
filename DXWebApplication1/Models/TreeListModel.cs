@@ -63,6 +63,38 @@ namespace DXWebApplication1.Models
             return list;
 
         }
+
+        public static List<TreeListModel> GetTreeListDataWithFilter(string filter)
+        {
+            var list = GetTreeListData();
+            if (string.IsNullOrEmpty(filter))
+                return list;
+
+
+            var searchResult = list.Where(t => t.Name.ToLower().Contains(filter.ToLower())).ToList();
+
+            List<TreeListModel> result = new List<TreeListModel>(searchResult);
+
+            foreach (TreeListModel item in searchResult)
+            {
+                TreeListModel parent = GetParent(list, item);
+                while (parent!=null)
+                {
+                    if(!result.Contains(parent))
+                    {
+                        result.Add(parent);
+                    }
+                    parent = GetParent(list, parent);
+                }
+            }
+
+            return result;
+        }
+
+        private static TreeListModel GetParent(List<TreeListModel> model, TreeListModel item)
+        {
+            return model.Find(c => c.Id == item.ParentId);
+        }
         private static void AddToList(List<TreeListModel> list, int Id,string Name,string Data,int?ParentId)
         {
             list.Add(new TreeListModel { Id = Id, Name = Name, Data =Data,ParentId=ParentId });

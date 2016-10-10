@@ -43,13 +43,35 @@ function OnEndCallback(s, e) {
 function OnTextChanged(s, e) {
     treeList1.PerformCallback({ filter: TextBox.GetText() });
 }
+
+function OnFilterButtonClick(s, e) {
+    treeList1.PerformCallback({ ozFilter: TextBoxFilter.GetText() });
+
+}
+
 </script>
 @Html.DevExpress().TextBox(settings =>
 {
     settings.Name = "TextBox";
-    settings.Properties.Caption = "Filter";
+    settings.Properties.Caption = "Search";
     settings.Properties.ClientSideEvents.TextChanged = "OnTextChanged";
 }).GetHtml()
+
+@Html.DevExpress().TextBox(settings =>
+{
+    settings.Name = "TextBoxFilter";
+    settings.Properties.Caption = "Filter";
+}).GetHtml()
+
+@Html.DevExpress().Button(settings =>
+{
+    settings.Name = "btnFilter";
+    settings.Text = "Filter";
+    settings.ClientSideEvents.Click = "OnFilterButtonClick";
+
+}).GetHtml()
+
+
 
     @using (Html.BeginForm())
     {
