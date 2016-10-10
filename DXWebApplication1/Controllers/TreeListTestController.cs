@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DXWebApplication1.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -15,8 +16,15 @@ namespace DXWebApplication1.Controllers
         }
         public ActionResult TreeListControl()
         {
-
-            return View();
+            var model = TreeListModel.GetTreeListData();
+            return PartialView(model);
         }
+
+        public ActionResult Custom(string filter = "")
+        {
+            ViewData["search"] = filter.ToLower();
+            return PartialView("TreeListControl", TreeListModel.GetTreeListData());
+        }
+
     }
 }

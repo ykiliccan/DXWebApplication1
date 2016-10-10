@@ -1,48 +1,157 @@
-﻿
-@Html.DevExpress().TreeList(settings =>
-{
-    settings.Name = "treeList1";
-    settings.CallbackRouteValues = new { Controller = "TabPageTest", Action = "TreeListControl" };
-    settings.Width = 424;
-    settings.Height = 353;
-    settings.CallbackRouteValues = new { Controller = "TabPageTest", Action = "TreeListControl" };
-    settings.CustomActionRouteValues = new { Controller = "TabPageTest", Action = "TreeListControl" };
-    settings.SettingsEditing.AddNewNodeRouteValues = new { Controller = "TabPageTest", Action = "TreeListControlAddNew" };
-    settings.SettingsEditing.UpdateNodeRouteValues = new { Controller = "TabPageTest", Action = "TreeListControlEdit" };
-    settings.SettingsEditing.DeleteNodeRouteValues = new { Controller = "TabPageTest", Action = "TreeListControlDelete" };
+﻿@using DXWebApplication1.UI
+@{ 
+    var treeList = Html.DevExpress().TreeList(settings =>
+    {
+        settings.Name = "treeList1";
+        settings.CallbackRouteValues = new { Controller = "TreeListTest", Action = "TreeListControl" };
+        settings.Width = 800;
+        settings.Height = 500;
+        settings.Settings.ScrollableHeight = 500;
+        settings.CallbackRouteValues = new { Controller = "TreeListTest", Action = "TreeListControl" };
+        settings.CustomActionRouteValues = new { Controller = "TreeListTest", Action = "Custom" };
+        settings.SettingsEditing.AddNewNodeRouteValues = new { Controller = "TreeListTest", Action = "TreeListControlAddNew" };
+        settings.SettingsEditing.UpdateNodeRouteValues = new { Controller = "TreeListTest", Action = "TreeListControlEdit" };
+        settings.SettingsEditing.DeleteNodeRouteValues = new { Controller = "TreeListTest", Action = "TreeListControlDelete" };
 
-    settings.SettingsBehavior.ExpandCollapseAction = TreeListExpandCollapseAction.NodeClick;
-    settings.SettingsBehavior.AutoExpandAllNodes = false;
+        settings.SettingsBehavior.ExpandCollapseAction = TreeListExpandCollapseAction.NodeClick;
+        settings.SettingsBehavior.AutoExpandAllNodes = false;
 
-    settings.CommandColumn.Visible = true;
-    //settings.CommandColumn.ShowNewButtonInHeader = false;
-    settings.CommandColumn.NewButton.Visible = true;
-    settings.CommandColumn.EditButton.Visible = true;
-    settings.SettingsEditing.Mode = TreeListEditMode.EditFormAndDisplayNode;
-    settings.SettingsPopupEditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
-    settings.SettingsPopupEditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
-    settings.SettingsPopupEditForm.Modal = true;
-    settings.SettingsPopupEditForm.AllowResize = false;
-    settings.SettingsBehavior.AllowFocusedNode = true;
+        settings.CommandColumn.Visible = true;
+        //settings.CommandColumn.ShowNewButtonInHeader = false;
+        settings.CommandColumn.NewButton.Visible = true;
+        settings.CommandColumn.EditButton.Visible = true;
+        settings.SettingsEditing.Mode = TreeListEditMode.EditFormAndDisplayNode;
+        settings.SettingsPopupEditForm.HorizontalAlign = PopupHorizontalAlign.WindowCenter;
+        settings.SettingsPopupEditForm.VerticalAlign = PopupVerticalAlign.WindowCenter;
+        settings.SettingsPopupEditForm.Modal = true;
+        settings.SettingsPopupEditForm.AllowResize = false;
+        settings.SettingsBehavior.AllowFocusedNode = true;
+        //settings.SettingsSelection.Recursive = true;
 
-    settings.ClientSideEvents.BeginCallback = @"OnBeginCallback";
-    settings.ClientSideEvents.NodeFocusing = "OnTreeNodeFocusing";
+        settings.ClientSideEvents.BeginCallback = @"OnBeginCallback";
+        settings.ClientSideEvents.NodeFocusing = "OnTreeNodeFocusing";
 
-    settings.CommandColumn.Width = Unit.Pixel(150);
-    settings.CommandColumn.DeleteButton.Visible = false;
-    settings.CommandColumn.DeleteButton.Image.IconID = IconID.EditDelete16x16;
-    settings.CommandColumn.EditButton.Image.IconID = IconID.EditEdit16x16;
-    settings.CommandColumn.NewButton.Image.IconID = IconID.ActionsInsert16x16;
+        settings.CommandColumn.Width = Unit.Pixel(150);
+        settings.CommandColumn.DeleteButton.Visible = false;
+        settings.CommandColumn.DeleteButton.Image.IconID = IconID.EditDelete16x16;
+        settings.CommandColumn.EditButton.Image.IconID = IconID.EditEdit16x16;
+        settings.CommandColumn.NewButton.Image.IconID = IconID.ActionsInsert16x16;
 
-    TreeListCommandColumnCustomButton deleteButton = new TreeListCommandColumnCustomButton();
-    deleteButton.Image.IconID = IconID.EditDelete16x16;
-    deleteButton.Text = "Delete";
-    deleteButton.Visibility = TreeListCustomButtonVisibility.AllNodes;
-    deleteButton.ID = "cmdDelete";
-    settings.CommandColumn.CustomButtons.Add(deleteButton);
+        TreeListCommandColumnCustomButton deleteButton = new TreeListCommandColumnCustomButton();
+        deleteButton.Image.IconID = IconID.EditDelete16x16;
+        deleteButton.Text = "Delete";
+        deleteButton.Visibility = TreeListCustomButtonVisibility.AllNodes;
+        deleteButton.ID = "cmdDelete";
+        settings.CommandColumn.CustomButtons.Add(deleteButton);
 
-    settings.AutoGenerateColumns = false;
-    //settings.Width = Unit.Percentage(100);
-    settings.KeyFieldName = "Id";
-    settings.ParentFieldName = "parentId";
-}).GetHtml()
+        settings.AutoGenerateColumns = false;
+        //settings.Width = Unit.Percentage(100);
+        settings.KeyFieldName = "Id";
+        settings.ParentFieldName = "ParentId";
+
+        settings.Columns.Add("Id").Name = "Id";
+        settings.Columns.Add("ParentId").Name ="ParentId";
+        settings.Columns.Add(col =>
+        {
+            col.FieldName = "Name";
+            col.PropertiesEdit.EncodeHtml = false;
+            col.SetDataCellTemplateContentForSearch(Html, (ViewData["search"] == null ? "" : (string)ViewData["search"]), "highlight");
+
+            //col.SetDataCellTemplateContent(c => {
+            //    string searchText = ViewData["search"] == null ? "" : (string)ViewData["search"];
+            //    string cell_text = c.Text;
+
+            //    if (searchText.Length > cell_text.Length)
+            //        ViewContext.Writer.Write(cell_text);
+
+            //    if (searchText != "")
+            //    {
+            //        string cell_text_lower = cell_text.ToLower();
+            //        string serchText_lower = searchText.ToLower();
+            //        int start_pos = cell_text_lower.IndexOf(serchText_lower);
+            //        int span_length = ("<span class='highlight'>").Length;
+            //        if (start_pos >= 0)
+            //        {
+            //            cell_text = cell_text.Insert(start_pos, "<span class='highlight'>");
+            //            cell_text = cell_text.Insert(start_pos + span_length + serchText_lower.Length, "</span>");
+            //        }
+
+            //        ViewContext.Writer.Write(cell_text);
+            //    }
+            //    else
+            //        ViewContext.Writer.Write(cell_text);
+
+            //});
+
+        });
+
+        settings.Columns.Add(col =>
+        {
+            col.FieldName = "Data";
+            col.PropertiesEdit.EncodeHtml = false;
+            col.SetDataCellTemplateContentForSearch(Html, (ViewData["search"] == null ? "" : (string)ViewData["search"]), "highlight");
+
+        });
+
+        settings.ClientSideEvents.EndCallback = "OnEndCallback";
+
+        settings.SettingsSelection.Recursive = true;
+
+
+        // settings.Columns.Add("Data").Name="Data";
+
+
+        settings.BeforeGetCallbackResult = (s, e) =>
+        {
+            if (ViewData["search"] == null) return;
+            var tree = s as ASPxTreeList;
+            TreeListNodeIterator iterator = new TreeListNodeIterator(tree.RootNode);
+            while (iterator.Current != null)
+            {
+                CheckNode(iterator.Current);
+                iterator.GetNext();
+            }
+        };
+
+
+
+
+
+        // settings.Settings.ShowFooter = true;
+        settings.Settings.GridLines = System.Web.UI.WebControls.GridLines.Both;
+        //settings.SettingsBehavior.ColumnResizeMode = ColumnResizeMode.NextColumn;
+        settings.SettingsPager.Mode = TreeListPagerMode.ShowAllNodes;
+        // settings.SettingsPager.PageSize = 25;
+        settings.SettingsPager.AllButton.Visible = true;
+        settings.SettingsPager.FirstPageButton.Visible = true;
+        settings.SettingsPager.LastPageButton.Visible = true;
+        settings.Settings.VerticalScrollBarMode = ScrollBarMode.Auto;
+
+
+    });
+}
+
+@treeList.Bind(Model).GetHtml()
+
+@functions{
+    public void CheckNode(TreeListNode node)
+    {
+        string s_text = ((string)ViewData["search"]).ToLower();
+        List<string> liste = GetSearchableColumns();
+
+        foreach (string s in liste)
+        {
+            object node_value = node.GetValue(s);
+            if (node_value != null)
+            {
+                if (node_value.ToString().ToLower().IndexOf(s_text) >= 0)
+                    node.MakeVisible();
+            }
+        }
+    }
+
+    public List<string> GetSearchableColumns()
+    {
+        return new List<string>() {"Name","Data" };
+    }
+}

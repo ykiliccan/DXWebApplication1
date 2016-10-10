@@ -3,5 +3,55 @@
     ViewBag.Title = "Index";
 }
 
-<h2>Index</h2>
+<style type="text/css">
+    .highlight {
+        background-color: #99FF66;
+    }
+</style>
 
+
+
+<script type="text/javascript">
+function OnBeginCallback(s, e) {
+        console.log('Tree Begin callback : ' + e.command);
+
+
+        //var container = $("body");
+        //var token = $('input[name="__RequestVerificationToken"]', container).val();
+        //e.customArgs["__RequestVerificationToken"] = token;
+
+        //if (e.command === "StartEditNewNode") {
+        //   // console.log('GrupId: ' + gvStokParametreListe.cpAnaGrupId);
+        //    e.customArgs["_grupId"] = 989999;
+        //}
+        //else if (e.command === "UpdateEdit") {
+        //    console.log('TreeList: ' + gvStokParametreListe.cpParametreDegerListesi);
+        //    e.customArgs["ParametreDegerListesi"] = gvStokParametreListe.cpParametreDegerListesi;
+        //    e.customArgs["_grupId"] = 989988;
+        //}
+    }
+function OnTreeNodeFocusing(s, e) {
+
+    //    sonBakilanStokNodKeyi = e.nodeKey;
+
+}
+
+function OnEndCallback(s, e) {
+
+    console.log("end callback");
+}
+function OnTextChanged(s, e) {
+    treeList1.PerformCallback({ filter: TextBox.GetText() });
+}
+</script>
+@Html.DevExpress().TextBox(settings =>
+{
+    settings.Name = "TextBox";
+    settings.Properties.Caption = "Filter";
+    settings.Properties.ClientSideEvents.TextChanged = "OnTextChanged";
+}).GetHtml()
+
+    @using (Html.BeginForm())
+    {
+        Html.RenderAction("TreeListControl", "TreeListTest");
+    }
