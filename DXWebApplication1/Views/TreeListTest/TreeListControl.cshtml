@@ -57,32 +57,7 @@
             col.PropertiesEdit.EncodeHtml = false;
             col.SetDataCellTemplateContentForSearch(Html, (ViewData["search"] == null ? "" : (string)ViewData["search"]), "highlight");
             
-            //col.SetDataCellTemplateContent(c => {
-            //    string searchText = ViewData["search"] == null ? "" : (string)ViewData["search"];
-            //    string cell_text = c.Text;
-
-            //    if (searchText.Length > cell_text.Length)
-            //        ViewContext.Writer.Write(cell_text);
-
-            //    if (searchText != "")
-            //    {
-            //        string cell_text_lower = cell_text.ToLower();
-            //        string serchText_lower = searchText.ToLower();
-            //        int start_pos = cell_text_lower.IndexOf(serchText_lower);
-            //        int span_length = ("<span class='highlight'>").Length;
-            //        if (start_pos >= 0)
-            //        {
-            //            cell_text = cell_text.Insert(start_pos, "<span class='highlight'>");
-            //            cell_text = cell_text.Insert(start_pos + span_length + serchText_lower.Length, "</span>");
-            //        }
-
-            //        ViewContext.Writer.Write(cell_text);
-            //    }
-            //    else
-            //        ViewContext.Writer.Write(cell_text);
-
-            //});
-
+         
         });
 
         settings.Columns.Add(col =>

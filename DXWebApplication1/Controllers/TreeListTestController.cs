@@ -14,28 +14,40 @@ namespace DXWebApplication1.Controllers
         {
             return View();
         }
-        public ActionResult TreeListControl()
+        public ActionResult TreeListControl(string search, string filter, string columnList)
         {
-            var model = TreeListModel.GetTreeListData();
+            //ViewData["search"] = search == null ? null : search.ToLower();
+
+            // var model = TreeListModel.GetTreeListData();
+            var model = GetData(search, filter, columnList);
+
             return PartialView(model);
         }
 
-        public ActionResult Custom(string filter = "",string ozFilter="")
+        public ActionResult Custom(string search, string filter,string columnList)
         {
-            ViewData["search"] = filter.ToLower();
-            ViewData["ozFilter"] = ozFilter.ToLower();
+
+            var model = GetData(search, filter, columnList);
+            return PartialView("TreeListControl", model);
+        }
+
+        public List<TreeListModel> GetData(string search,string filter,string columnList)
+        {
+            ViewData["search"] = search == null ? null : search.ToLower();
+            ViewData["filter"] = filter == null ? null : filter.ToLower();
+            ViewData["columnList"] = columnList == null ? null : columnList.ToLower();
 
             List<TreeListModel> model = null;
-            if(!string.IsNullOrWhiteSpace(ozFilter))
+            if (!string.IsNullOrWhiteSpace(filter))
             {
-                model = TreeListModel.GetTreeListDataWithFilter(ozFilter);
+                model = TreeListModel.GetTreeListDataWithFilter(filter, columnList);
             }
             else
             {
                 model = TreeListModel.GetTreeListData();
             }
 
-            return PartialView("TreeListControl", model);
+            return model;
         }
 
     }

@@ -15,6 +15,9 @@
 function OnBeginCallback(s, e) {
         console.log('Tree Begin callback : ' + e.command);
 
+        e.customArgs["search"] = TextBox.GetText();
+        e.customArgs["filter"] = TextBoxFilter.GetText();
+        e.customArgs["columnList"] = tokenBoxFilter.GetText();
 
         //var container = $("body");
         //var token = $('input[name="__RequestVerificationToken"]', container).val();
@@ -41,13 +44,25 @@ function OnEndCallback(s, e) {
     console.log("end callback");
 }
 function OnTextChanged(s, e) {
-    treeList1.PerformCallback({ filter: TextBox.GetText() });
+    treeList1.PerformCallback({ search: TextBox.GetText() });
 }
 
 function OnFilterButtonClick(s, e) {
-    treeList1.PerformCallback({ ozFilter: TextBoxFilter.GetText() });
+    treeList1.PerformCallback({ filter: TextBoxFilter.GetText(), columnList: tokenBoxFilter.GetText() });
 
 }
+function OnFilterTextChanged(s, e) {
+    
+    
+    //treeList1.PerformCallback({ ozFilter: TextBoxFilter.GetText() });
+
+}
+function OnFilterValueChanged(s, e) {
+    treeList1.PerformCallback({ filter: TextBoxFilter.GetText(), columnList: tokenBoxFilter.GetText() });
+    console.log(TextBoxFilter.GetText());
+
+}
+
 
 </script>
 @Html.DevExpress().TextBox(settings =>
@@ -64,53 +79,96 @@ function OnFilterButtonClick(s, e) {
 }).GetHtml()*@
 
 
-@Html.DevExpress().ButtonEdit(settings =>
+@*@Html.DevExpress().ButtonEdit(settings =>
 {
     settings.Name = "TextBoxFilter";
     settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
 
     //settings.Properties.ClearButton.Visibility = AutoBoolean.True;
 
-}).GetHtml()
+}).GetHtml()*@
 
-@Html.DevExpress().TokenBox(settings => {
+@*@Html.DevExpress().TokenBox(settings => {
     settings.Name = "tokenBoxFilter";
     settings.Properties.Items.Add("Name");
     settings.Properties.Items.Add("Data");
 
-}).GetHtml()
+}).GetHtml()*@
 
-@Html.DevExpress().Button(settings =>
+@*@Html.DevExpress().Button(settings =>
 {
     settings.Name = "btnFilter";
     settings.Text = "Filter";
     
     settings.ClientSideEvents.Click = "OnFilterButtonClick";
 
-}).GetHtml()
+}).GetHtml()*@
 
-@Html.DevExpress().FormLayout(settings =>
+@Html.DevExpress().RoundPanel(pnl =>
 {
-    settings.Name = "frmSearchPanel";
-    settings.ColCount = 4;
-    settings.Items.AddEmptyItem();
-
-    settings.Items.Add(item1 =>
+    pnl.Name = "searchFrmRoundPanel";
+    pnl.AllowCollapsingByHeaderClick = true;
+    pnl.ShowCollapseButton = true;
+    pnl.SetContent(() =>
     {
-        item1.Name = "item1";
-        item1.NestedExtensionType = FormLayoutNestedExtensionItemType.TokenBox;
-        TokenBoxSettings tbs = (TokenBoxSettings)item1.NestedExtensionSettings;
-        tbs.Name = "item1";
-        tbs.Properties.Items.Add("Name");
-        tbs.Properties.Items.Add("Data");
-        tbs.Properties.Tokens.Add("Name");
+        @Html.DevExpress().FormLayout(settings =>
+        {
+            settings.Name = "frmSearchPanel";
+            settings.ColCount = 4;
+            settings.Items.AddEmptyItem();
+            settings.SettingsItemCaptions.Location = LayoutItemCaptionLocation.Top;
+            //settings.ControlStyle.Border.BorderStyle = BorderStyle.Solid;
+            //settings.ControlStyle.Border.BorderWidth = Unit.Pixel(1);
 
+            settings.Items.Add(item =>
+            {
+                item.Name = "TextBoxFilter";
+                item.ShowCaption = DefaultBoolean.False;
+                item.HelpText = "Aranacak kelime";
+                item.HelpTextSettings.Position = HelpTextPosition.Top;
+                item.NestedExtensionType = FormLayoutNestedExtensionItemType.ButtonEdit;
+                ButtonEditSettings ts = (ButtonEditSettings)item.NestedExtensionSettings;
+                ts.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.Always;
+
+                ts.Properties.ClientSideEvents.ValueChanged = "OnFilterValueChanged";
+            });
+
+            settings.Items.Add(item =>
+            {
+                item.Name = "tokenBoxFilter";
+                item.ShowCaption = DefaultBoolean.False;
+                item.NestedExtensionType = FormLayoutNestedExtensionItemType.TokenBox;
+                //item.Caption = "Arama Yapılacak Kolonlar";
+                item.HelpText = "Arama Yapılacak Kolonlar";
+                item.HelpTextSettings.Position = HelpTextPosition.Top;
+                TokenBoxSettings tbs = (TokenBoxSettings)item.NestedExtensionSettings;
+                tbs.Name = "tokenBoxFilter";
+                tbs.Properties.Items.Add("Name");
+                tbs.Properties.Items.Add("Data");
+                tbs.Properties.Tokens.Add("Name");
+
+            });
+
+            settings.Items.Add(item =>
+            {
+                item.Name = "btnFilter";
+                //item.Caption = "";
+                item.ShowCaption = DefaultBoolean.False;
+                item.VerticalAlign = FormLayoutVerticalAlign.Bottom;
+                item.NestedExtensionType = FormLayoutNestedExtensionItemType.Button;
+                ButtonSettings ts = (ButtonSettings)item.NestedExtensionSettings;
+                ts.ClientSideEvents.Click = "OnFilterButtonClick";
+                ts.Text = "Süz";
+                ts.Images.Image.IconID = IconID.ActionsFilter16x16devav;
+            });
+
+        }).GetHtml();
     });
 
-
 }).GetHtml()
+
 
     @using (Html.BeginForm())
     {
-        Html.RenderAction("TreeListControl", "TreeListTest");
-    }
+    Html.RenderAction("TreeListControl", "TreeListTest");
+}

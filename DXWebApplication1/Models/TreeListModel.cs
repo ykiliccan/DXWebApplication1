@@ -64,14 +64,29 @@ namespace DXWebApplication1.Models
 
         }
 
-        public static List<TreeListModel> GetTreeListDataWithFilter(string filter)
+        public static List<TreeListModel> GetTreeListDataWithFilter(string filter,string columnList)
         {
             var list = GetTreeListData();
+            string[] columnNames =columnList==null?null: columnList.Split(new char[] {','});
+
             if (string.IsNullOrEmpty(filter))
                 return list;
 
+            List<TreeListModel> searchResult = null;
+            //var searchResult = list.Where(t => t.Name.ToLower().Contains(filter.ToLower())).ToList();
+            if(columnNames ==null || columnNames.Length == 0)
+            {
+                searchResult = list.Where(t => t.Name.ToLower().Contains(filter.ToLower()) || t.Data.ToLower().Contains(filter.ToLower()) ).ToList();
+            }
+            else
+            {
+                searchResult = list.Where(t =>
+                                 (columnNames.Contains("Name") && t.Name.ToLower().Contains(filter.ToLower())) ||
+                                 (columnNames.Contains("Data") && t.Data.ToLower().Contains(filter.ToLower()))  ).ToList();
+            }
 
-            var searchResult = list.Where(t => t.Name.ToLower().Contains(filter.ToLower())).ToList();
+
+             
 
             List<TreeListModel> result = new List<TreeListModel>(searchResult);
 
