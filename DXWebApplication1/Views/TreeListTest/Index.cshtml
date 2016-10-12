@@ -57,21 +57,58 @@ function OnFilterButtonClick(s, e) {
     settings.Properties.ClientSideEvents.TextChanged = "OnTextChanged";
 }).GetHtml()
 
-@Html.DevExpress().TextBox(settings =>
+@*@Html.DevExpress().TextBox(settings =>
 {
     settings.Name = "TextBoxFilter";
     settings.Properties.Caption = "Filter";
+}).GetHtml()*@
+
+
+@Html.DevExpress().ButtonEdit(settings =>
+{
+    settings.Name = "TextBoxFilter";
+    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
+
+    //settings.Properties.ClearButton.Visibility = AutoBoolean.True;
+
+}).GetHtml()
+
+@Html.DevExpress().TokenBox(settings => {
+    settings.Name = "tokenBoxFilter";
+    settings.Properties.Items.Add("Name");
+    settings.Properties.Items.Add("Data");
+
 }).GetHtml()
 
 @Html.DevExpress().Button(settings =>
 {
     settings.Name = "btnFilter";
     settings.Text = "Filter";
+    
     settings.ClientSideEvents.Click = "OnFilterButtonClick";
 
 }).GetHtml()
 
+@Html.DevExpress().FormLayout(settings =>
+{
+    settings.Name = "frmSearchPanel";
+    settings.ColCount = 4;
+    settings.Items.AddEmptyItem();
 
+    settings.Items.Add(item1 =>
+    {
+        item1.Name = "item1";
+        item1.NestedExtensionType = FormLayoutNestedExtensionItemType.TokenBox;
+        TokenBoxSettings tbs = (TokenBoxSettings)item1.NestedExtensionSettings;
+        tbs.Name = "item1";
+        tbs.Properties.Items.Add("Name");
+        tbs.Properties.Items.Add("Data");
+        tbs.Properties.Tokens.Add("Name");
+
+    });
+
+
+}).GetHtml()
 
     @using (Html.BeginForm())
     {

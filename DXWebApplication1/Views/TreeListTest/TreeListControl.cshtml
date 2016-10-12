@@ -56,7 +56,7 @@
             col.FieldName = "Name";
             col.PropertiesEdit.EncodeHtml = false;
             col.SetDataCellTemplateContentForSearch(Html, (ViewData["search"] == null ? "" : (string)ViewData["search"]), "highlight");
-
+            
             //col.SetDataCellTemplateContent(c => {
             //    string searchText = ViewData["search"] == null ? "" : (string)ViewData["search"];
             //    string cell_text = c.Text;
