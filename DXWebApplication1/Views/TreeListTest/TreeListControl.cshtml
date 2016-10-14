@@ -44,6 +44,8 @@
         deleteButton.ID = "cmdDelete";
         settings.CommandColumn.CustomButtons.Add(deleteButton);
 
+
+
         settings.AutoGenerateColumns = false;
         //settings.Width = Unit.Percentage(100);
         settings.KeyFieldName = "Id";
@@ -56,8 +58,8 @@
             col.FieldName = "Name";
             col.PropertiesEdit.EncodeHtml = false;
             col.SetDataCellTemplateContentForSearch(Html, (ViewData["search"] == null ? "" : (string)ViewData["search"]), "highlight");
-            
-         
+
+
         });
 
         settings.Columns.Add(col =>
@@ -72,13 +74,30 @@
 
         settings.SettingsSelection.Recursive = true;
 
+        settings.ClientSideEvents.ContextMenu = "OnContextMenu";
+
+
+        settings.CommandColumn.SetHeaderCaptionTemplateContent(htc =>
+        {
+            ViewContext.Writer.Write(Html.AntiForgeryToken().ToHtmlString());
+            Html.DevExpress().Button(btnSettings =>
+            {
+                btnSettings.Name = "expanCollapseAll_" + settings.Name;
+                btnSettings.Images.Image.IconID = IconID.ArrowsMovedown16x16office2013;
+                btnSettings.Text = "Aç/Kapa";
+               // btnSettings.ClientSideEvents.Click =
+            }).Render();
+            ViewContext.Writer.Write("&nbsp;");
+        });
+
+
 
         // settings.Columns.Add("Data").Name="Data";
 
 
         settings.BeforeGetCallbackResult = (s, e) =>
         {
-            if (ViewData["search"] == null) return;
+            if (  string.IsNullOrEmpty(ViewData["search"] as string )) return;
             var tree = s as ASPxTreeList;
             TreeListNodeIterator iterator = new TreeListNodeIterator(tree.RootNode);
             while (iterator.Current != null)

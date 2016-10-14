@@ -48,8 +48,7 @@ function OnTextChanged(s, e) {
 }
 
 function OnFilterButtonClick(s, e) {
-    treeList1.PerformCallback({ filter: TextBoxFilter.GetText(), columnList: tokenBoxFilter.GetText() });
-
+    ApplyTreeListFilter(true);
 }
 function OnFilterTextChanged(s, e) {
     
@@ -58,13 +57,97 @@ function OnFilterTextChanged(s, e) {
 
 }
 function OnFilterValueChanged(s, e) {
-    treeList1.PerformCallback({ filter: TextBoxFilter.GetText(), columnList: tokenBoxFilter.GetText() });
+    ApplyTreeListFilter();
+}
+function ApplyTreeListFilter(checkEmptyFilter){
+
+    filterText = TextBoxFilter.GetText();
+    if (!checkEmptyFilter || (checkEmptyFilter && filterText)) {
+        treeList1.PerformCallback({ filter: filterText, columnList: tokenBoxFilter.GetText(), filterMode: rbListTreeFilter.GetValue() });
+    }
     console.log(TextBoxFilter.GetText());
+}
+function OnTokensChanged(s, e) {
+    ApplyTreeListFilter(true);
+}
+
+function OnFilterRadioListSelectedIndexChanged(s, e) {
+
+    ApplyTreeListFilter(true);
+}
+
+function OnContextMenu (s,e){
+    if (e.objectType != 'Node') return;
+    s.SetFocusedNodeKey(e.objectKey);
+    var mouseX = ASPxClientUtils.GetEventX(e.htmlEvent);
+    var mouseY = ASPxClientUtils.GetEventY(e.htmlEvent);
+    ShowMenu(e.objectKey, mouseX, mouseY);
+}
+
+function ShowMenu(nodeKey, x, y) {
+    clientPopupMenu.ShowAtPos(x, y);
+    var menu = ASPxClientPopupMenu.Cast(clientPopupMenu);
+   // menu.GetItemByName("paste").SetEnabled(copyNodeKey != null);
 
 }
 
+function OnMenuClick(s, e) {
+
+    switch (e.item.name) {
+        case "mItemExpandAll":
+            {
+                treeList1.ExpandAll();
+                break;
+            }
+        case "mItemCollapseAll":
+            {
+                treeList1.CollapseAll();
+
+                break;
+            }
+    }
+
+}
 
 </script>
+
+@Html.DevExpress().PopupMenu(settings =>
+{
+    settings.Name = "clientPopupMenu";
+    settings.AllowSelectItem = false;
+
+
+    settings.Items.Add(item =>
+    {
+        item.Text = "Tümünü Aç";
+        item.Name = "mItemExpandAll";
+        item.Image.Url = "/Content/images/tumunuAc.png";
+
+    });
+
+
+    settings.Items.Add(item =>
+    {
+        item.Text = "Tümünü Aç";
+        item.Name = "mItemExpandAll";
+        item.Image.Url = "/Content/images/tumunuAc.png";
+
+    });
+
+    settings.Items.Add(item =>
+    {
+        item.Text = "Tümünü Kapat";
+        item.Name = "mItemCollapseAll";
+        item.Image.Url = "/Content/images/tumunuKapa.png";
+
+    });
+
+
+    settings.ClientSideEvents.ItemClick = "OnMenuClick";
+
+}).GetHtml()
+
+
 @Html.DevExpress().TextBox(settings =>
 {
     settings.Name = "TextBox";
@@ -72,53 +155,21 @@ function OnFilterValueChanged(s, e) {
     settings.Properties.ClientSideEvents.TextChanged = "OnTextChanged";
 }).GetHtml()
 
-@*@Html.DevExpress().TextBox(settings =>
-{
-    settings.Name = "TextBoxFilter";
-    settings.Properties.Caption = "Filter";
-}).GetHtml()*@
-
-
-@*@Html.DevExpress().ButtonEdit(settings =>
-{
-    settings.Name = "TextBoxFilter";
-    settings.Properties.ClearButton.DisplayMode = ClearButtonDisplayMode.OnHover;
-
-    //settings.Properties.ClearButton.Visibility = AutoBoolean.True;
-
-}).GetHtml()*@
-
-@*@Html.DevExpress().TokenBox(settings => {
-    settings.Name = "tokenBoxFilter";
-    settings.Properties.Items.Add("Name");
-    settings.Properties.Items.Add("Data");
-
-}).GetHtml()*@
-
-@*@Html.DevExpress().Button(settings =>
-{
-    settings.Name = "btnFilter";
-    settings.Text = "Filter";
-    
-    settings.ClientSideEvents.Click = "OnFilterButtonClick";
-
-}).GetHtml()*@
-
 @Html.DevExpress().RoundPanel(pnl =>
 {
     pnl.Name = "searchFrmRoundPanel";
     pnl.AllowCollapsingByHeaderClick = true;
     pnl.ShowCollapseButton = true;
+    pnl.View = DevExpress.Web.View.GroupBox;
+    pnl.ShowHeader = false;
     pnl.SetContent(() =>
     {
         @Html.DevExpress().FormLayout(settings =>
         {
             settings.Name = "frmSearchPanel";
-            settings.ColCount = 4;
-            settings.Items.AddEmptyItem();
+            settings.ColCount = 5;
             settings.SettingsItemCaptions.Location = LayoutItemCaptionLocation.Top;
-            //settings.ControlStyle.Border.BorderStyle = BorderStyle.Solid;
-            //settings.ControlStyle.Border.BorderWidth = Unit.Pixel(1);
+            
 
             settings.Items.Add(item =>
             {
@@ -135,6 +186,27 @@ function OnFilterValueChanged(s, e) {
 
             settings.Items.Add(item =>
             {
+                item.Name = "rbListTreeFilter";
+                item.ShowCaption = DefaultBoolean.False;
+                item.NestedControlCellStyle.Paddings.PaddingBottom = 0;
+                //item.HorizontalAlign = FormLayoutHorizontalAlign.Right;
+                item.VerticalAlign = FormLayoutVerticalAlign.Bottom;
+                item.NestedExtensionType = FormLayoutNestedExtensionItemType.RadioButtonList;
+                RadioButtonListSettings rbs = (RadioButtonListSettings)item.NestedExtensionSettings;
+                rbs.Properties.RepeatDirection = RepeatDirection.Horizontal;
+                rbs.Properties.Items.Add("İçerir", 1).Selected = true;
+                rbs.Properties.Items.Add("İle Başlar", 2);
+
+                rbs.ControlStyle.Border.BorderStyle = BorderStyle.None;
+                rbs.ControlStyle.VerticalAlign = VerticalAlign.Bottom;
+                rbs.Properties.RootStyle.Paddings.PaddingBottom = 0;
+                rbs.Properties.ClientSideEvents.SelectedIndexChanged = "OnFilterRadioListSelectedIndexChanged";
+
+            });
+
+
+            settings.Items.Add(item =>
+            {
                 item.Name = "tokenBoxFilter";
                 item.ShowCaption = DefaultBoolean.False;
                 item.NestedExtensionType = FormLayoutNestedExtensionItemType.TokenBox;
@@ -146,6 +218,8 @@ function OnFilterValueChanged(s, e) {
                 tbs.Properties.Items.Add("Name");
                 tbs.Properties.Items.Add("Data");
                 tbs.Properties.Tokens.Add("Name");
+
+                tbs.Properties.ClientSideEvents.TokensChanged = "OnTokensChanged";
 
             });
 

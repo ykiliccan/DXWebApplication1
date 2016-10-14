@@ -14,24 +14,24 @@ namespace DXWebApplication1.Controllers
         {
             return View();
         }
-        public ActionResult TreeListControl(string search, string filter, string columnList)
+        public ActionResult TreeListControl(string search, string filter, string columnList,string filterMode)
         {
             //ViewData["search"] = search == null ? null : search.ToLower();
 
             // var model = TreeListModel.GetTreeListData();
-            var model = GetData(search, filter, columnList);
+            var model = GetData(search, filter, columnList,filterMode);
 
             return PartialView(model);
         }
 
-        public ActionResult Custom(string search, string filter,string columnList)
+        public ActionResult Custom(string search, string filter,string columnList, string filterMode)
         {
 
-            var model = GetData(search, filter, columnList);
+            var model = GetData(search, filter, columnList,filterMode);
             return PartialView("TreeListControl", model);
         }
 
-        public List<TreeListModel> GetData(string search,string filter,string columnList)
+        public List<TreeListModel> GetData(string search,string filter,string columnList, string filterMode)
         {
             ViewData["search"] = search == null ? null : search.ToLower();
             ViewData["filter"] = filter == null ? null : filter.ToLower();
@@ -40,7 +40,7 @@ namespace DXWebApplication1.Controllers
             List<TreeListModel> model = null;
             if (!string.IsNullOrWhiteSpace(filter))
             {
-                model = TreeListModel.GetTreeListDataWithFilter(filter, columnList);
+                model = TreeListModel.GetTreeListDataWithFilter(filter, columnList,filterMode);
             }
             else
             {

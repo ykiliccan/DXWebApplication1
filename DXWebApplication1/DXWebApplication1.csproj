@@ -191,6 +191,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\images\tumunuAc.png" />
+    <Content Include="Content\images\tumunuKapa.png" />
     <Content Include="Content\jquery-ui.css" />
     <Content Include="Content\jquery-ui.min.css" />
     <Content Include="Content\Ribbon\Editor.png" />

@@ -64,7 +64,7 @@ namespace DXWebApplication1.Models
 
         }
 
-        public static List<TreeListModel> GetTreeListDataWithFilter(string filter,string columnList)
+        public static List<TreeListModel> GetTreeListDataWithFilter(string filter,string columnList, string filterMode)
         {
             var list = GetTreeListData();
             string[] columnNames =columnList==null?null: columnList.Split(new char[] {','});
@@ -72,17 +72,37 @@ namespace DXWebApplication1.Models
             if (string.IsNullOrEmpty(filter))
                 return list;
 
+            int mode = string.IsNullOrWhiteSpace(filterMode) || filterMode.Equals("1") ? 1 : 2;
+
+            string filterLowerCase = filter.ToLower();
+
             List<TreeListModel> searchResult = null;
             //var searchResult = list.Where(t => t.Name.ToLower().Contains(filter.ToLower())).ToList();
             if(columnNames ==null || columnNames.Length == 0)
             {
-                searchResult = list.Where(t => t.Name.ToLower().Contains(filter.ToLower()) || t.Data.ToLower().Contains(filter.ToLower()) ).ToList();
+                if (mode == 1)
+                {
+                    searchResult = list.Where(t => t.Name.ToLower().Contains(filterLowerCase) || t.Data.ToLower().Contains(filterLowerCase)).ToList();
+                }
+                else
+                {
+                    searchResult = list.Where(t => t.Name.ToLower().StartsWith(filterLowerCase) || t.Data.ToLower().StartsWith(filterLowerCase)).ToList();
+                }
             }
             else
             {
-                searchResult = list.Where(t =>
-                                 (columnNames.Contains("Name") && t.Name.ToLower().Contains(filter.ToLower())) ||
-                                 (columnNames.Contains("Data") && t.Data.ToLower().Contains(filter.ToLower()))  ).ToList();
+                if (mode == 1)
+                {
+                    searchResult = list.Where(t =>
+                                     (columnNames.Contains("Name") && t.Name.ToLower().Contains(filterLowerCase)) ||
+                                     (columnNames.Contains("Data") && t.Data.ToLower().Contains(filterLowerCase))).ToList();
+                }
+                else
+                {
+                    searchResult = list.Where(t =>
+                                    (columnNames.Contains("Name") && t.Name.ToLower().StartsWith(filterLowerCase)) ||
+                                    (columnNames.Contains("Data") && t.Data.ToLower().StartsWith(filterLowerCase))).ToList();
+                }
             }
 
 
